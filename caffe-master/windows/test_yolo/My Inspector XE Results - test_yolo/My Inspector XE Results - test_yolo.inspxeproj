@@ -1,0 +1,268 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+ <connectionOption></connectionOption>
+ <rdmgr>
+  <timestamp type="u64_t">1519808827</timestamp>
+  <hostname>RD_SW_WSS.rd01_protruly.com</hostname>
+  <os>windows</os>
+  <product>Intel® Inspector XE 2016 Update 3</product>
+  <buildNumber type="s32_t">460803</buildNumber>
+  <logicalCPUCount type="s32_t">8</logicalCPUCount>
+  <CPUFrequency type="s64_t">3600000000</CPUFrequency>
+ </rdmgr>
+ <contextValues>
+  <contextValue>
+   <id>emulatorByCtxKnob</id>
+   <value></value>
+  </contextValue>
+ </contextValues>
+ <All_Configurations-All_Platforms>
+  <target_settings>
+   <selected_workload>
+    <localhost>launch</localhost>
+   </selected_workload>
+   <result_pattern>
+    <localhost>r@@@{at}</localhost>
+   </result_pattern>
+   <workloads>
+    <localhost>
+     <launch type="pointer" type_id="dasID_cctrl2::ApplicationWorkload" ptr_type="dasID_cctrl2::IWorkload">
+      <workload>
+       <targetName>launch</targetName>
+       <launch_app.app_to_launch>D:\Code_local\caffe\caffe-master\caffe-master\windows\..\Build\x64\Debug\test_yolo.exe</launch_app.app_to_launch>
+       <launch_app.working_folder>D:\Code_local\caffe\caffe-master\caffe-master\windows\test_yolo</launch_app.working_folder>
+       <launch_app.app_parameters>--label_file=D:/Code_local/caffe/caffe_yolo/label_map.txt --resize_height=448 --resize_width=448 --encoded=true --shuffle=true D:/VOCdevkit/VOC2012/ D:/Code_local/caffe/caffe_yolo/trainval.txt D:/Code_local/caffe/caffe_yolo/lmdb/trainval_lmdb</launch_app.app_parameters>
+       <launch_app.environment>PATH=C:\Program Files (x86)\IntelSWTools\compilers_and_libraries_2016\windows\redist\intel64\compiler;%PATH%&#13;
+PATH=C:\Program Files (x86)\IntelSWTools\compilers_and_libraries_2016\windows\redist\intel64\compiler;%PATH%&#13;
+&#13;
+    &#13;
+    </launch_app.environment>
+       <launch_app.environment_prepend>PATH=C:\Program Files (x86)\IntelSWTools\compilers_and_libraries_2016\windows\redist\intel64\compiler;</launch_app.environment_prepend>
+       <use_app_dir_as_work_dir type="bool">false</use_app_dir_as_work_dir>
+       <result_directory.path>D:\Code_local\caffe\caffe-master\caffe-master\windows\test_yolo\My Inspector XE Results - test_yolo\r@@@{at}</result_directory.path>
+       <search_directories>
+        <item>
+         <value>sym=D:\Code_local\caffe\caffe-master\caffe-master\windows\..\Build\x64\Debug</value>
+        </item>
+        <item>
+         <value>sym=D:\Code_local\caffe\caffe-master\caffe-master\windows</value>
+        </item>
+        <item>
+         <value>bin=D:\Code_local\caffe\caffe-master\caffe-master\windows\..\Build\x64\Debug</value>
+        </item>
+        <item>
+         <value>bin=D:\Code_local\caffe\caffe-master\caffe-master\windows</value>
+        </item>
+        <item>
+         <value>bin=D:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64</value>
+        </item>
+        <item>
+         <value>bin=D:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin</value>
+        </item>
+        <item>
+         <value>bin=C:\Program Files (x86)\Windows Kits\8.1\bin\x86</value>
+        </item>
+        <item>
+         <value>bin=C:\Program Files (x86)\Microsoft SDKs\Windows\v8.1A\bin\NETFX 4.5.1 Tools</value>
+        </item>
+        <item>
+         <value>bin=D:\Program Files (x86)\Microsoft Visual Studio 12.0\Common7\Tools\bin</value>
+        </item>
+        <item>
+         <value>bin=D:\Program Files (x86)\Microsoft Visual Studio 12.0\Common7\tools</value>
+        </item>
+        <item>
+         <value>bin=D:\Program Files (x86)\Microsoft Visual Studio 12.0\Common7\ide</value>
+        </item>
+        <item>
+         <value>bin=C:\Program Files (x86)\HTML Help Workshop</value>
+        </item>
+        <item>
+         <value>bin=C:\Program Files (x86)\MSBuild\12.0\bin</value>
+        </item>
+        <item>
+         <value>bin=C:\Windows\Microsoft.NET\Framework\v4.0.30319</value>
+        </item>
+        <item>
+         <value>bin=D:\Program Files (x86)\Microsoft Visual Studio 12.0\Common7\IDE\CommonExtensions\Microsoft\TeamFoundation\Team Explorer\NativeBinaries\x86</value>
+        </item>
+        <item>
+         <value>bin=C:\Program Files (x86)\IntelSWTools\Trace Analyzer and Collector\9.1.2.024\bin</value>
+        </item>
+        <item>
+         <value>bin=C:\Program Files (x86)\IntelSWTools\compilers_and_libraries_2016.3.207\windows\mpi\intel64\bin</value>
+        </item>
+        <item>
+         <value>bin=C:\Program Files (x86)\Common Files\Intel\Shared Libraries\redist\intel64_win\mpirt</value>
+        </item>
+        <item>
+         <value>bin=C:\Program Files (x86)\Common Files\Intel\Shared Libraries\redist\ia32_win\mpirt</value>
+        </item>
+        <item>
+         <value>bin=C:\Program Files (x86)\Common Files\Intel\Shared Libraries\redist\intel64_win\compiler</value>
+        </item>
+        <item>
+         <value>bin=C:\Program Files (x86)\Common Files\Intel\Shared Libraries\redist\ia32_win\compiler</value>
+        </item>
+        <item>
+         <value>bin=C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.5\bin</value>
+        </item>
+        <item>
+         <value>bin=C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.5\libnvvp</value>
+        </item>
+        <item>
+         <value>bin=C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\bin</value>
+        </item>
+        <item>
+         <value>bin=C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.0\libnvvp</value>
+        </item>
+        <item>
+         <value>bin=C:\Windows\system32</value>
+        </item>
+        <item>
+         <value>bin=C:\Windows</value>
+        </item>
+        <item>
+         <value>bin=C:\Windows\System32\Wbem</value>
+        </item>
+        <item>
+         <value>bin=C:\Windows\System32\WindowsPowerShell\v1.0</value>
+        </item>
+        <item>
+         <value>bin=D:\Program Files\TortoiseSVN\bin</value>
+        </item>
+        <item>
+         <value>bin=C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common</value>
+        </item>
+        <item>
+         <value>bin=C:\Program Files (x86)\Windows Kits\8.1\Windows Performance Toolkit</value>
+        </item>
+        <item>
+         <value>bin=C:\Program Files\Microsoft SQL Server\110\Tools\Binn</value>
+        </item>
+        <item>
+         <value>bin=C:\Program Files (x86)\Microsoft SDKs\TypeScript\1.0</value>
+        </item>
+        <item>
+         <value>bin=C:\Program Files\Microsoft SQL Server\120\Tools\Binn</value>
+        </item>
+        <item>
+         <value>bin=D:\opencv3.0\opencv\build\x86\vc12\bin</value>
+        </item>
+        <item>
+         <value>bin=C:\Program Files (x86)\IDM Computer Solutions\UltraEdit</value>
+        </item>
+        <item>
+         <value>bin=D:\tools\opencv\opencv\build\x86\vc12\bin</value>
+        </item>
+        <item>
+         <value>bin=D:\opencv_cuda_lib\install\x64\vc12\bin</value>
+        </item>
+        <item>
+         <value>bin=D:\opencv_cuda\tbb44_20150728oss\tbb44_20150728oss\bin\intel64\vc12</value>
+        </item>
+        <item>
+         <value>bin=D:\opencv_cuda_lib\opencv2.4.10\build\x64\vc12\bin</value>
+        </item>
+        <item>
+         <value>bin=D:\opencv_x64\opencv\x64\vc12\bin</value>
+        </item>
+        <item>
+         <value>bin=D:\Program Files\MATLAB\R2012a\runtime\win64</value>
+        </item>
+        <item>
+         <value>bin=D:\Program Files\MATLAB\R2012a\bin</value>
+        </item>
+        <item>
+         <value>bin=d:\Program Files\MATLAB\MATLAB Compiler Runtime\v717\runtime\win64</value>
+        </item>
+        <item>
+         <value>bin=D:\取图工具\platform-tools</value>
+        </item>
+        <item>
+         <value>bin=d:</value>
+        </item>
+        <item>
+         <value>bin=D:/Code_local\caffe\caffe-master\caffe-master\windows\test_yolo\Program Files\Git\cmd</value>
+        </item>
+        <item>
+         <value>bin=d:\Program Files\Git\cmd</value>
+        </item>
+        <item>
+         <value>bin=C:\Program Files (x86)\IntelSWTools\Trace Analyzer and Collector\9.1.2.024\dll</value>
+        </item>
+        <item>
+         <value>bin=d:\Program Files (x86)\SSH Communications Security\SSH Secure Shell</value>
+        </item>
+        <item>
+         <value>bin=D:\Program Files\MATLAB\R2012a\bin\win64</value>
+        </item>
+        <item>
+         <value>bin=D:\opencv32X64\x64\vc12\bin</value>
+        </item>
+        <item>
+         <value>bin=D:\tools\opencv\opencv\build\x86\vc10\bin</value>
+        </item>
+        <item>
+         <value>bin=D:\opencv3.0\opencv\build\x64\vc12\bin</value>
+        </item>
+        <item>
+         <value>bin=D:\python\python2.7</value>
+        </item>
+        <item>
+         <value>bin=D:\python\python2.7\Scripts</value>
+        </item>
+       </search_directories>
+       <context>
+        <contextValue>
+         <id>appdebug</id>
+         <value>off</value>
+        </contextValue>
+        <contextValue>
+         <id>custom_debugger</id>
+         <value></value>
+        </contextValue>
+        <contextValue>
+         <id>debug_this_problem</id>
+         <value></value>
+        </contextValue>
+        <contextValue>
+         <id>debug_using</id>
+         <value>gdb</value>
+        </contextValue>
+        <contextValue>
+         <id>heartbeat</id>
+         <value type="bool">true</value>
+        </contextValue>
+        <contextValue>
+         <id>modules_switch</id>
+         <value>knob.modules_switch.include</value>
+        </contextValue>
+        <contextValue>
+         <id>mrte_mode</id>
+         <value>auto</value>
+        </contextValue>
+        <contextValue>
+         <id>process_for_analysis</id>
+         <value></value>
+        </contextValue>
+        <contextValue>
+         <id>suppressions</id>
+         <value>delete</value>
+        </contextValue>
+        <contextValue>
+         <id>targetType</id>
+         <value>launch</value>
+        </contextValue>
+        <contextValue>
+         <id>traceMpi</id>
+         <value type="bool">false</value>
+        </contextValue>
+       </context>
+      </workload>
+     </launch>
+    </localhost>
+   </workloads>
+  </target_settings>
+ </All_Configurations-All_Platforms>
+</root>
