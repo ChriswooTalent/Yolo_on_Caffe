@@ -53,17 +53,31 @@ void BasePrefetchingDataLayer<Dtype>::LayerSetUp(
   for (int i = 0; i < PREFETCH_COUNT; ++i) {
     prefetch_[i].data_.mutable_cpu_data();
     if (this->output_labels_) {
-      prefetch_[i].label_.mutable_cpu_data();
+		if (this->box_label_){
+			for (int j = 0; j < top.size() - 1; ++j){
+				prefetch_[i].multi_label_[j]->mutable_cpu_data();
+			}
+		}
+		else{
+			prefetch_[i].label_.mutable_cpu_data();
+		}
     }
   }
 #ifndef CPU_ONLY
   if (Caffe::mode() == Caffe::GPU) {
-    for (int i = 0; i < PREFETCH_COUNT; ++i) {
-      prefetch_[i].data_.mutable_gpu_data();
-      if (this->output_labels_) {
-        prefetch_[i].label_.mutable_gpu_data();
-      }
-    }
+	  for (int i = 0; i < PREFETCH_COUNT; ++i) {
+		  prefetch_[i].data_.mutable_gpu_data();
+		  if (this->output_labels_) {
+			  if (this->box_label_) {
+				  for (int j = 0; j < top.size() - 1; ++j) {
+					  prefetch_[i].multi_label_[j]->mutable_gpu_data();
+				  }
+}
+			  else {
+				  prefetch_[i].label_.mutable_gpu_data();
+			  }
+}
+	}
   }
 #endif
   DLOG(INFO) << "Initializing prefetch";
