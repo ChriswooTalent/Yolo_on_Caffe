@@ -7,9 +7,20 @@ caffe.set_mode_cpu()
 model_filename = 'D:/Code_local/caffe_yolov2_windows/net_work_train/yolov2_correct.prototxt'
 yoloweight_filename = 'D:/Code_local/caffe_yolov2_windows/net_work_train/yolov2_416.weights'
 caffemodel_filename = 'D:/Code_local/caffe_yolov2_windows/net_work_train/yolov2.caffemodel'
+
+v3caffemodel = 'D:/Code_local/caffe/caffe-master/caffe-master/examples/yolov3/model/yolov3.caffemodel'
+v3yoloweight = 'D:/Code_local/caffe/caffe-master/caffe-master/examples/yolov3/weights/yolov3.weights'
+modelv3_filename = 'D:/Code_local/caffe/caffe-master/caffe-master/examples/yolov3/prototxt/yolov3_deploy.prototxt'
+train_modelv3_filename = 'D:/Code_local/caffe/caffe-master/caffe-master/examples/yolov3/prototxt/yolov3_train_val.prototxt'
+
+model_filename = modelv3_filename
+yoloweight_filename = v3yoloweight
+caffemodel_filename = v3caffemodel
 print 'model file is ', model_filename
 print 'weight file is ', yoloweight_filename
 print 'output caffemodel file is ', caffemodel_filename
+
+#net_train = caffe.Net(train_modelv3_filename, caffe.TRAIN)
 net = caffe.Net(model_filename, caffe.TEST)
 #net.forward()
 # for each layer, show the output shape
