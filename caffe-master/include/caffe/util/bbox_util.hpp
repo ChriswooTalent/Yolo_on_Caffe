@@ -19,9 +19,16 @@
 #include "caffe/caffe.hpp"
 
 namespace caffe {
+	class V3BoxData {
+	public:
+		int label_;
+		float score_;
+		vector<float> box_;
+	};
 
 typedef map<int, vector<NormalizedBBox> > LabelBBox;
 
+int int_index(vector<int> maskvalue, int bestn, int n);
 float BBoxSize(const NormalizedBBox& bbox, const bool normalized);
 bool SortBBoxAscend(const NormalizedBBox& bbox1, const NormalizedBBox& bbox2);
 bool SortBBoxDescend(const NormalizedBBox& bbox1, const NormalizedBBox& bbox2);
@@ -33,6 +40,186 @@ void CumSum(const vector<pair<float, int> >& pairs, vector<int>* cumsum);
 void ComputeAP(const vector<pair<float, int> >& tp, int num_pos,
                const vector<pair<float, int> >& fp, string ap_version,
                vector<float>* prec, vector<float>* rec, float* ap);
+
+bool BoxSortDecendScore(const V3BoxData& box1, const V3BoxData& box2);
+void ApplyNms(const vector<V3BoxData>& boxes, vector<int>* idxes, float threshold);
+
+template <typename Dtype>
+vector<Dtype> get_dyolov3_box(const Dtype* x, vector<Dtype> biases, int index, int n, int i, int j, int w, int h)
+{
+	vector<Dtype> b;
+	b.clear();
+	b.push_back((i + x[index + 0]) / w);
+	b.push_back((j + x[index + 1]) / h);
+	b.push_back(exp(x[index + 2]) * biases[2 * n] / w);
+	b.push_back(exp(x[index + 3]) * biases[2 * n + 1] / h);
+	return b;
+}
+
+template <typename Dtype>
+int yolo_num_detections(const Dtype* input_data, int side, int num_object, int num_class, float thresh)
+{
+	int sum = 0;
+	for (int i = 0; i < side; i++)
+	{
+		for (int j = 0; j < side; j++)
+		{
+			for (int n = 0; n < num_object; n++)
+			{
+				int obj_index = int obj_index = (i*side + j)*basic_length*num_object + n*basic_length + 4;
+				if (input_data[obj_index] > thresh)
+				{
+					sum += 1;
+				}
+			}
+		}
+	}
+	return sum;
+}
+
+template <typename Dtype>
+void GetYolov3GTBox(int side, int labelbaselength, const Dtype* label_data, map<int, vector<V3BoxData> >* gt_boxes) {
+	int locations = side*side;
+	for (int h = 0; h < side; h++)
+	{
+		for (int w = 0; w < side; w++)
+		{
+			V3BoxData gt_box;
+			int gridindex = h*side + w;
+			int label = static_cast<int>(label_data[locations * 2 + gridindex]);
+			gt_box.label_ = label;
+			gt_box.score_ = (float)gridindex / locations;
+			int box_index = locations * 3 + gridindex * 4;
+			for (int j = 0; j < 4; ++j) {
+				gt_box.box_.push_back(label_data[box_index + j]);
+			}
+			if (gt_boxes->find(label) == gt_boxes->end()) {
+				(*gt_boxes)[label] = vector<V3BoxData>(1, gt_box);
+			}
+			else {
+				(*gt_boxes)[label].push_back(gt_box);
+			}
+		}
+	}
+}
+
+template <typename Dtype>
+void GetYolov3PredBoxes(int side, int num_object, int num_class, int basic_length, const Dtype* input_data,
+	map<int, vector<V3BoxData> >* pred_boxes, vector<Dtype> biases, int score_type, float nms, float obj_threshold, float nms_threshold) {
+	vector<V3BoxData> tmp_boxes;
+	int pred_label = 0;
+	Dtype max_prob = 0;
+	for (int i = 0; i < side; i++)
+	{
+		for (int j = 0; j < side; j++)
+		{
+			for (int n = 0; n < num_object; n++)
+			{
+				V3BoxData pred_box;
+				int box_index = (i*side + j)*basic_length*num_object + n*basic_length + 0;
+				int obj_index = (i*side + j)*basic_length*num_object + n*basic_length + 4;
+				float objectness = input_data[obj_index];
+				if (objectness <= obj_threshold)
+				{
+					continue;
+				}
+				vector<Dtype> pred_bbox = get_dyolov3_box(input_data, biases, box_index, n, i, j, side, side);
+				pred_box.box_.push_back(pred_bbox[0]);
+				pred_box.box_.push_back(pred_bbox[1]);
+				pred_box.box_.push_back(pred_bbox[2]);
+				pred_box.box_.push_back(pred_bbox[3]);
+				for (int c = 0; c < num_class; c++)
+				{
+					int class_index = (i*side + j)*basic_length*num_object + n*basic_length + 5 + c;
+					Dtype prob = objectness*input_data[class_index];
+					if (prob > max_prob)
+					{
+						max_prob = prob;
+						pred_label = c;
+					}
+				}
+				pred_box.label_ = pred_label;
+				pred_box.score_ = max_prob;
+				tmp_boxes.push_back(pred_box);
+			}
+		}
+	}
+
+	std::sort(tmp_boxes.begin(), tmp_boxes.end(), BoxSortDecendScore);
+	vector<int> idxes;
+	ApplyNms(tmp_boxes, &idxes, nms_threshold);
+	for (int i = 0; i < idxes.size(); ++i) {
+		V3BoxData box_data = tmp_boxes[idxes[i]];
+		if (pred_boxes->find(box_data.label_) == pred_boxes->end()) {
+			(*pred_boxes)[box_data.label_] = vector<V3BoxData>();
+		}
+		(*pred_boxes)[box_data.label_].push_back(box_data);
+	}
+}
+
+template <typename Dtype>
+void GetGtFormLabelsimple(int side, int labelbaselength, int maxboxes, const Dtype* label_data, vector<V3BoxData>* gt_boxes) {
+	for (int i = 0; i < maxboxes; i++)
+	{
+		V3BoxData gt_box;
+		int box_index = i*labelbaselength;
+		gt_box.label_ = label_data[box_index + 4];
+		Dtype x = label_data[box_index + 1];
+		Dtype y = label_data[box_index + 2];
+		if (!x) break;
+		for (int j = 0; j < 4; ++j) {
+			gt_box.box_.push_back(label_data[box_index + j]);
+		}
+		(*gt_boxes).push_back(gt_box);
+	}
+}
+
+template <typename Dtype>
+void GetGtFormLabelData(int side, int labelbaselength, const Dtype* label_data, vector<V3BoxData>* gt_boxes) {
+	int locations = side*side;
+	for (int h = 0; h < side; h++)
+	{
+		for (int w = 0; w < side; w++)
+		{
+			V3BoxData gt_box;
+			int gridindex = h*side + w;
+			int label = static_cast<int>(label_data[locations * 2 + gridindex]);
+			bool isobj = label_data[locations + gridindex];
+			gt_box.label_ = label;
+			gt_box.score_ = (float)gridindex/locations;
+			int box_index = locations * 3 + gridindex * 4;
+			for (int j = 0; j < 4; ++j) {
+				gt_box.box_.push_back(label_data[box_index + j]);
+			}
+			(*gt_boxes).push_back(gt_box);
+		}
+	}
+}
+
+template <typename Dtype>
+void GetTainGtFormLabelData(int side, int labelbaselength, const Dtype* label_data, vector<V3BoxData>* gt_boxes) {
+	for (int h = 0; h < side; h++)
+	{
+		for (int w = 0; w < side; w++)
+		{
+			V3BoxData gt_box;
+			int grid_index = h*side + w;
+			int label = static_cast<int>(label_data[locations * 2 + grid_index]);
+			gt_box.label_ = label;
+			gt_box.score_ = i;
+			int box_index = locations * 3 + i * 4;
+			for (int j = 0; j < 4; ++j) {
+				gt_box.box_.push_back(label_data[box_index + j]);
+			}
+			if (gt_boxes->find(label) == gt_boxes->end()) {
+				(*gt_boxes)[label] = vector<BoxData>(1, gt_box);
+			}
+			else {
+				(*gt_boxes)[label].push_back(gt_box);
+			}
+		}
+	}
+}
                      
 template <typename Dtype>
 void setNormalizedBBox(NormalizedBBox& bbox, Dtype x, Dtype y, Dtype w, Dtype h)
