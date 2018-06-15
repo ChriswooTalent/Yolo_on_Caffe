@@ -13,6 +13,44 @@
 #include "caffe/util/bbox_util.hpp"
 
 namespace caffe {
+bool BoxSortDecendScore(const V3BoxData& box1, const V3BoxData& box2) {
+	return box1.score_ > box2.score_;
+}
+
+void ApplyNms(const vector<V3BoxData>& boxes, vector<int>* idxes, float threshold) {
+	map<int, int> idx_map;
+	for (int i = 0; i < boxes.size() - 1; ++i) {
+		if (idx_map.find(i) != idx_map.end()) {
+			continue;
+		}
+		vector<float> box1 = boxes[i].box_;
+		for (int j = i + 1; j < boxes.size(); ++j) {
+			if (idx_map.find(j) != idx_map.end()) {
+				continue;
+			}
+			vector<float> box2 = boxes[j].box_;
+			float iou = Calc_iou(box1, box2);
+			if (iou >= threshold) {
+				idx_map[j] = 1;
+			}
+		}
+	}
+	for (int i = 0; i < boxes.size(); ++i) {
+		if (idx_map.find(i) == idx_map.end()) {
+			idxes->push_back(i);
+		}
+	}
+}
+
+int int_index(vector<int> maskvalue, int bestn, int n)
+{
+	for (int i = 0; i < n; i++)
+	{
+		if (maskvalue[i] == bestn)
+			return i;
+	}
+	return -1;
+}
 
 float BBoxSize(const NormalizedBBox& bbox, const bool normalized) {
   if (bbox.xmax() < bbox.xmin() || bbox.ymax() < bbox.ymin()) {

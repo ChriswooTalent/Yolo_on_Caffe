@@ -187,6 +187,8 @@ message SolverParameter {
     
   // yolo detection resize flag
   optional int32 yoloresize = 52 [default = 0];
+  // yolo v3 param burn_in
+  optional int32 burn_in = 49 [default = 1000];
 
   // Set clip_gradients to >= 0 to clip parameter gradients to that L2 norm,
   // whenever their actual L2 norm is larger.
@@ -357,7 +359,12 @@ message LayerParameter {
 
   // Parameters shared by loss layers.
   optional LossParameter loss_param = 101;
-  
+  // Yolo v3 detection layer
+  optional Yolov3DetectParameter yolov3_detection_param = 207;
+  // Yolo v3 detection Result layer
+  optional Yolov3DetectResultParameter yolov3_detectresult_param = 208;
+  // Yolo v3 detection loss layer
+  optional Yolov3LossParameter yolov3_loss_param = 206;
   // Yolo detection loss layer
   optional DetectionLossParameter detection_loss_param = 200;
   // Yolo detection evaluation layer
@@ -382,6 +389,8 @@ message LayerParameter {
   optional ConcatParameter concat_param = 104;
   optional ContrastiveLossParameter contrastive_loss_param = 105;
   optional ConvolutionParameter convolution_param = 106;
+  // Deconvolution  
+  optional DeconvolutionParameter deconvolution_param = 153;  
   optional CropParameter crop_param = 144;
   optional DataParameter data_param = 107;
   optional DropoutParameter dropout_param = 108;
@@ -627,6 +636,56 @@ message DetectionLossParameter {
   optional bool constriant = 9 [default = false];
 }
 
+message Yolov3LossParameter{
+   // yolo v3 detection loss layer
+  optional uint32 side = 1 [default = 13];
+  optional uint32 num_class = 2 [default = 20];
+  optional uint32 bias_match = 3 [default = 1];
+  optional uint32 coords = 4 [default = 4];
+  optional uint32 num = 5 [default = 9];
+  optional float object_scale = 6 [default = 1.0];
+  optional float class_scale = 7 [default = 1.0];
+  optional float noobject_scale = 8 [default = 0.5];
+  optional float coord_scale = 9 [default = 5.0];
+  optional float ignore_thresh = 10 [default = 0.5];
+  optional float truth_thresh = 11 [default = 1.0];
+  optional float jitter = 12 [default = 0.2];
+  optional uint32 random = 13 [default = 0];
+  optional uint32 focal_loss = 14 [default = 0];
+  optional uint32 max_boxes = 15 [default = 30];
+  repeated float biases = 16;
+  repeated uint32 masks = 17;
+  optional string class_map = 18;
+}
+
+message Yolov3DetectParameter{
+   // yolo v3 detection loss layer
+  optional uint32 side = 1 [default = 13];
+  optional uint32 num_class = 2 [default = 20];
+  optional uint32 coords = 3 [default = 4];
+  optional uint32 num = 4 [default = 9];
+  optional float obj_thresh = 5 [default = 1.0];
+  optional float nms_thresh = 6 [default = 0.5];
+  optional float nms = 7 [default = -1];
+  optional uint32 max_boxes = 8 [default = 30];
+  repeated float biases = 9;
+  repeated uint32 masks = 10;
+}
+
+message Yolov3DetectResultParameter{
+   // yolo v3 detection result layer
+  optional uint32 side = 1 [default = 13];
+  optional uint32 num_class = 2 [default = 20];
+  optional uint32 coords = 3 [default = 4];
+  optional uint32 num = 4 [default = 9];
+  optional float obj_thresh = 5 [default = 1.0];
+  optional float nms_thresh = 6 [default = 0.5];
+  optional float nms = 7 [default = -1];
+  optional uint32 max_boxes = 8 [default = 30];
+  repeated float biases = 9;
+  repeated uint32 masks = 10;
+}
+
 message EvalDetectionParameter {
   enum ScoreType {
     OBJ = 0;
@@ -729,6 +788,59 @@ message NormalizedBBox {
   optional bool difficult = 6;
   optional float score = 7;
   optional float size = 8;
+}
+
+message DeconvolutionParameter {  
+  optional uint32 num_output = 1; // The number of outputs for the layer  
+  optional bool bias_term = 2 [default = true]; // whether to have bias terms  
+  
+  // Pad, kernel size, and stride are all given as a single value for equal  
+  // dimensions in all spatial dimensions, or once per spatial dimension.  
+  repeated uint32 pad = 3; // The padding size; defaults to 0  
+  repeated uint32 kernel_size = 4; // The kernel size  
+  repeated uint32 stride = 6; // The stride; defaults to 1  
+  // Factor used to dilate the kernel, (implicitly) zero-filling the resulting  
+  // holes. (Kernel dilation is sometimes referred to by its use in the  
+  // algorithme à trous from Holschneider et al. 1987.)  
+  repeated uint32 dilation = 18; // The dilation; defaults to 1  
+  
+  // For 2D convolution only, the *_h and *_w versions may also be used to  
+  // specify both spatial dimensions.  
+  optional uint32 pad_h = 9 [default = 0]; // The padding height (2D only)  
+  optional uint32 pad_w = 10 [default = 0]; // The padding width (2D only)  
+  optional uint32 kernel_h = 11; // The kernel height (2D only)  
+  optional uint32 kernel_w = 12; // The kernel width (2D only)  
+  optional uint32 stride_h = 13; // The stride height (2D only)  
+  optional uint32 stride_w = 14; // The stride width (2D only)  
+  
+  optional uint32 group = 5 [default = 1]; // The group size for group conv  
+  
+  optional FillerParameter weight_filler = 7; // The filler for the weight  
+  optional FillerParameter bias_filler = 8; // The filler for the bias  
+  enum Engine {  
+    DEFAULT = 0;  
+    CAFFE = 1;  
+    CUDNN = 2;  
+  }  
+  optional Engine engine = 15 [default = DEFAULT];  
+  
+  // The axis to interpret as "channels" when performing convolution.  
+  // Preceding dimensions are treated as independent inputs;  
+  // succeeding dimensions are treated as "spatial".  
+  // With (N, C, H, W) inputs, and axis == 1 (the default), we perform  
+  // N independent 2D convolutions, sliding C-channel (or (C/g)-channels, for  
+  // groups g>1) filters across the spatial axes (H, W) of the input.  
+  // With (N, C, D, H, W) inputs, and axis == 1, we perform  
+  // N independent 3D convolutions, sliding (C/g)-channels  
+  // filters across the spatial axes (D, H, W) of the input.  
+  optional int32 axis = 16 [default = 1];  
+  
+  // Whether to force use of the general ND convolution, even if a specific  
+  // implementation for blobs of the appropriate number of spatial dimensions  
+  // is available. (Currently, there is only a 2D-specific convolution  
+  // implementation; for input blobs with num_axes != 2, this option is  
+  // ignored and the ND implementation will be used.)  
+  optional bool force_nd_im2col = 17 [default = false];  
 }
 
 message ConvolutionParameter {
